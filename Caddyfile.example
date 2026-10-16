@@ -1,0 +1,5 @@
+# Replace rewrite.example.com with your real subdomain.
+# DNS A/AAAA record must point to this server first.
+rewrite.example.com {
+    reverse_proxy 127.0.0.1:18080
+}

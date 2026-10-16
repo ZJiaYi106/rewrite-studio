@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0e17" />
+  <title>Rewrite Studio · 公众号内容重写台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=GFS+Didot&family=Manrope:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static.css" />
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"><span class="star star-1">✦</span><span class="star star-2">✧</span><span class="star star-3">✦</span><span class="star star-4">·</span><span class="star star-5">✧</span></div>
+  <div class="floral-line floral-left" aria-hidden="true"></div>
+  <div class="floral-line floral-right" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Rewrite Studio 首页">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span>REWRITE<span class="brand-accent"> · </span>STUDIO</span>
+    </a>
+    <nav class="nav-links" aria-label="主导航"><a href="#workspace">工作台</a><a href="#result-panel">预览</a><span class="nav-divider"></span><span class="top-status"><i></i> SYSTEM READY</span></nav>
+  </header>
+
+  <main class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy-side">
+        <div class="eyebrow"><span class="eyebrow-line"></span>ONE ARTICLE · MANY EXPRESSIONS</div>
+        <h1 id="hero-title"><span>重新理解，</span><em>重新成文。</em></h1>
+        <p class="hero-copy">把一篇已获授权的公众号文章，交给一套可观察的内容重写流程。保留事实，让标题、结构、节奏和话术重新生长。</p>
+        <div class="hero-notes"><div><span class="note-mark">✦</span><strong>理解主题</strong><small>先提炼核心事实与读者问题</small></div><div><span class="note-mark">◇</span><strong>重做结构</strong><small>重新设计标题和文章节奏</small></div><div><span class="note-mark">≋</span><strong>可复核</strong><small>原文与改写稿并排预览</small></div></div>
+      </div>
+      <div class="hero-emblem" aria-hidden="true"><div class="emblem-ring outer"></div><div class="emblem-ring inner"></div><div class="emblem-sun">✦</div><span class="emblem-label">R / S</span><span class="emblem-orbit orbit-one"></span><span class="emblem-orbit orbit-two"></span></div>
+    </section>
+
+    <section id="workspace" class="workspace" aria-label="文章处理工作台">
+      <div class="input-panel panel">
+        <div class="panel-head"><div><span class="kicker">从这里开始</span><h2>放入一篇文章</h2></div><span class="panel-index">01</span></div>
+        <form id="job-form">
+          <label class="field-label" for="article-url">公众号文章链接</label>
+          <div class="url-wrap"><span class="url-icon">↗</span><input id="article-url" name="url" type="text" inputmode="url" placeholder="mp.weixin.qq.com/s/..." autocomplete="url" required /></div>
+          <p class="field-hint">只处理你拥有版权或已获得明确授权的内容。</p>
+          <div class="options-grid">
+            <div class="option-block"><span class="field-label">图片处理方式</span><div class="segmented" role="radiogroup" aria-label="图片处理策略">
+              <label class="segment active"><input type="radio" name="image_strategy" value="skip" checked><span>保留原图</span><small>DEFAULT</small></label>
+              <label class="segment"><input type="radio" name="image_strategy" value="light_edit"><span>轻度处理</span><small>EDIT</small></label>
+              <label class="segment"><input type="radio" name="image_strategy" value="regenerate"><span>AI 重制</span><small>GENERATE</small></label>
+            </div></div>
+          </div>
+          <label class="consent"><input id="authorized" type="checkbox" required><span class="checkmark"></span><span>我确认拥有该内容版权，或已获得明确授权进行处理。</span></label>
+          <button class="submit-button" type="submit"><span class="button-icon">✦</span><span>开始重写</span><span class="button-arrow">↗</span></button>
+          <div id="form-error" class="form-error" role="alert"></div>
+        </form>
+      </div>
+
+      <div class="flow-panel panel">
+        <div class="panel-head"><div><span class="kicker">正在发生</span><h2>处理轨迹</h2></div><span id="job-state" class="state-pill">STANDBY</span></div>
+        <div class="progress-rail"><div id="progress-bar" class="progress-bar"></div></div>
+        <div class="live-action">
+          <div class="live-pulse"><span></span><span></span><span></span></div>
+          <div><span class="live-label">CURRENT ACTION</span><strong id="current-action">等待输入</strong><p id="current-detail">提交链接后，这里会显示系统正在执行的具体工作。</p></div>
+          <span id="step-elapsed" class="step-time">00:00</span>
+        </div>
+        <div id="steps" class="steps">
+          <div class="step empty"><span class="step-node">—</span><div><strong>等待输入</strong><p>提交链接后，处理轨迹会显示在这里</p></div></div>
+        </div>
+        <div class="work-stats" aria-label="处理统计">
+          <div><span>正文字符</span><strong id="stat-content">—</strong></div><div><span>图片数量</span><strong id="stat-images">—</strong></div><div><span>已处理图片</span><strong id="stat-processed">—</strong></div><div><span>运行时间</span><strong id="stat-elapsed">00:00</strong></div>
+        </div>
+        <div class="activity-log"><div class="log-head"><span>ACTIVITY LOG</span><span>LIVE</span></div><div id="activity-events" class="activity-events"><p class="log-empty">等待任务事件…</p></div></div>
+        <div class="flow-footer"><span id="job-id">NO ACTIVE JOB</span><span id="elapsed">READY WHEN YOU ARE</span></div>
+      </div>
+    </section>
+
+    <section id="result-panel" class="result-panel panel hidden" aria-live="polite">
+      <div class="result-top"><div><span class="kicker">03 / DELIVERY</span><h2>原文与改写稿</h2></div><span class="result-badge">SIDE-BY-SIDE REVIEW</span></div>
+      <div class="result-content"><div class="result-symbol">✦</div><div class="result-copy"><p id="result-title" class="result-title">—</p><p class="result-subtitle">对照阅读原文与改写稿，确认事实、语气和结构后再继续编辑。</p></div><a id="download-link" class="download-button" href="#" download><span>下载成品 ZIP</span><span>↓</span></a></div>
+      <div class="preview-toolbar"><div class="preview-tabs" role="tablist" aria-label="预览内容"><button type="button" class="preview-tab active" data-preview="both" role="tab" aria-selected="true">并排对照</button><button type="button" class="preview-tab" data-preview="original" role="tab" aria-selected="false">只看原文</button><button type="button" class="preview-tab" data-preview="rewritten" role="tab" aria-selected="false">只看改写稿</button></div><span id="preview-count" class="preview-count">正在准备预览</span></div>
+      <div id="comparison" class="comparison-grid" aria-live="polite">
+        <article class="preview-column original-column"><header class="preview-column-head"><span>原文</span><span id="original-count">—</span></header><div id="original-preview" class="markdown-preview"><p class="preview-placeholder">原文将在这里显示</p></div></article>
+        <article class="preview-column rewritten-column"><header class="preview-column-head"><span>改写稿</span><span id="rewritten-count">—</span></header><div id="rewritten-preview" class="markdown-preview"><p class="preview-placeholder">改写稿将在这里显示</p></div></article>
+      </div>
+      <div id="result-warnings" class="warnings hidden"></div>
+    </section>
+
+    <footer class="site-footer"><span>REWRITE STUDIO / PRIVATE WORKFLOW</span><span>DESIGNED FOR REVIEWABLE OUTPUTS</span></footer>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
