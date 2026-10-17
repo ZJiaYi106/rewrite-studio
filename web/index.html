@@ -37,10 +37,25 @@
     <section id="workspace" class="workspace" aria-label="文章处理工作台">
       <div class="input-panel panel">
         <div class="panel-head"><div><span class="kicker">从这里开始</span><h2>放入一篇文章</h2></div><span class="panel-index">01</span></div>
+        <div class="input-mode-tabs" style="display: flex; gap: 8px; margin-bottom: 20px;">
+          <button type="button" class="mode-tab active" data-mode="url" style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; border-radius: 6px; font-size: 14px;">公众号链接</button>
+          <button type="button" class="mode-tab" data-mode="file" style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; border-radius: 6px; font-size: 14px;">上传文档</button>
+        </div>
         <form id="job-form">
           <label class="field-label" for="article-url">公众号文章链接</label>
           <div class="url-wrap"><span class="url-icon">↗</span><input id="article-url" name="url" type="text" inputmode="url" placeholder="mp.weixin.qq.com/s/..." autocomplete="url" required /></div>
-          <p class="field-hint">只处理你拥有版权或已获得明确授权的内容。</p>
+          
+          <div id="file-upload-area" class="file-upload-area" style="display: none;">
+            <label class="field-label" for="article-file">上传文档</label>
+            <div class="file-drop-zone" style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s;">
+              <input type="file" id="article-file" name="file" accept=".pdf,.docx,.doc,.txt,.md,.markdown" style="display: none;">
+              <div class="file-icon" style="font-size: 48px; margin-bottom: 16px;">📄</div>
+              <p style="color: rgba(255,255,255,0.9); margin-bottom: 8px; font-weight: 500;">点击选择或拖拽文件到此处</p>
+              <p style="color: rgba(255,255,255,0.5); font-size: 13px;">支持 PDF、Word、TXT、Markdown</p>
+              <p id="file-name" style="color: rgba(255,255,255,0.7); margin-top: 16px; font-size: 14px;"></p>
+            </div>
+          </div>
+<p class="field-hint">只处理你拥有版权或已获得明确授权的内容。</p>
           <div class="options-grid">
             <div class="option-block"><span class="field-label">图片处理方式</span><div class="segmented" role="radiogroup" aria-label="图片处理策略">
               <label class="segment active"><input type="radio" name="image_strategy" value="skip" checked><span>保留原图</span><small>DEFAULT</small></label>

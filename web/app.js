@@ -25,6 +25,14 @@ const comparisonEl = document.querySelector('#comparison');
 const previewCount = document.querySelector('#preview-count');
 const originalCount = document.querySelector('#original-count');
 const rewrittenCount = document.querySelector('#rewritten-count');
+const modeTabs = document.querySelectorAll('.mode-tab');
+const urlArea = document.querySelector('.url-wrap').parentElement;
+const fileUploadArea = document.querySelector('#file-upload-area');
+const fileInput = document.querySelector('#article-file');
+const fileDropZone = document.querySelector('.file-drop-zone');
+const fileNameDisplay = document.querySelector('#file-name');
+let currentMode = 'url';
+let selectedFile = null;
 const submitButton = form.querySelector('button[type="submit"]');
 
 let pollTimer = null;
@@ -271,5 +279,78 @@ form.addEventListener('submit', async (event) => {
     formError.textContent = error.message;
     submitButton.disabled = false;
     submitButton.innerHTML = '<span class="button-icon">↗</span><span>开始处理</span><span class="button-arrow">→</span>';
+  }
+});
+
+
+
+// 模式切换逻辑
+modeTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const mode = tab.dataset.mode;
+    currentMode = mode;
+    
+    // 更新标签样式
+    modeTabs.forEach(t => {
+      t.classList.toggle('active', t.dataset.mode === mode);
+      if (t.dataset.mode === mode) {
+        t.style.background = 'rgba(255,255,255,0.1)';
+        t.style.color = '#fff';
+      } else {
+        t.style.background = 'transparent';
+        t.style.color = 'rgba(255,255,255,0.6)';
+      }
+    });
+    
+    // 切换输入区域
+    if (mode === 'url') {
+      urlArea.style.display = 'block';
+      fileUploadArea.style.display = 'none';
+      urlInput.required = true;
+      fileInput.required = false;
+    } else {
+      urlArea.style.display = 'none';
+      fileUploadArea.style.display = 'block';
+      urlInput.required = false;
+      fileInput.required = true;
+    }
+  });
+});
+
+// 文件选择处理
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    selectedFile = file;
+    fileNameDisplay.textContent = `已选择：${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  }
+});
+
+// 拖拽上传
+fileDropZone.addEventListener('click', () => {
+  fileInput.click();
+});
+
+fileDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  fileDropZone.style.borderColor = 'rgba(255,255,255,0.6)';
+  fileDropZone.style.background = 'rgba(255,255,255,0.05)';
+});
+
+fileDropZone.addEventListener('dragleave', () => {
+  fileDropZone.style.borderColor = 'rgba(255,255,255,0.3)';
+  fileDropZone.style.background = 'transparent';
+});
+
+fileDropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  fileDropZone.style.borderColor = 'rgba(255,255,255,0.3)';
+  fileDropZone.style.background = 'transparent';
+  
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    selectedFile = file;
+    fileInput.files = e.dataTransfer.files;
+    fileNameDisplay.textContent = `已选择：${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   }
 });

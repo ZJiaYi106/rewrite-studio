@@ -11,7 +11,8 @@ class AgentState(TypedDict, total=False):
     interrupting later, non-dependent nodes.
     """
 
-    url: str
+    url: Optional[str]  # 公众号 URL（可选）
+    document_path: Optional[str]  # 上传文档路径（可选）
     authorized: bool
     work_dir: Optional[str]
     image_strategy: Optional[str]

@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -35,10 +35,17 @@ class CreateJobRequest(BaseModel):
     image_strategy: Literal["skip", "light_edit", "regenerate"] = "skip"
 
 
+class CreateJobFromFileRequest(BaseModel):
+    authorized: bool = Field(..., description="用户确认拥有版权或已获明确授权")
+    image_strategy: Literal["skip", "light_edit", "regenerate"] = "skip"
+    image_strategy: Literal["skip", "light_edit", "regenerate"] = "skip"
+
+
 @dataclass
 class Job:
     id: str
-    url: str
+    url: str | None = None  # URL 或 None（如果是文档上传）
+    document_path: str | None = None  # 文档路径
     image_strategy: str
     work_dir: Path
     status: str = "queued"
@@ -116,7 +123,7 @@ def _snapshot(job: Job) -> dict[str, Any]:
         "step_elapsed_seconds": max(0, now - job.step_started_at) if job.step_started_at else 0,
         "elapsed_seconds": elapsed,
         "title": job.title,
-        "url": job.url,
+        "url": job.url or "(文档上传)",
         "image_strategy": job.image_strategy,
         "output_dir": job.output_dir,
         "final_path": job.final_path,
@@ -133,9 +140,10 @@ async def _run_job(job: Job) -> None:
 
     job.status = "running"
     job.started_at = time.time()
-    _set_step(job, "parse", "正在抓取文章", "请求公众号页面，解析标题、正文结构和图片地址。")
+    _set_step(job, "parse", "正在解析内容", "解析文章内容、标题、正文结构和图片。")
     state: dict[str, Any] = {
-        "url": job.url,
+        "url": job.url or "(文档上传)",
+        "document_path": job.document_path,
         "authorized": True,
         "work_dir": str(job.work_dir),
         "image_strategy": job.image_strategy,
@@ -271,6 +279,66 @@ async def create_job(payload: CreateJobRequest) -> dict[str, Any]:
     job.task = asyncio.create_task(_run_job(job))
     return _snapshot(job)
 
+
+
+
+@app.post("/api/jobs/upload", status_code=202)
+async def create_job_from_file(
+    file: UploadFile = File(...),
+    authorized: bool = Field(..., description="用户确认拥有版权或已获明确授权"),
+    image_strategy: str = "skip"
+) -> dict[str, Any]:
+    """上传文档并创建处理任务
+    
+    支持的文件格式：
+    - PDF (.pdf)
+    - Word 文档 (.docx, .doc)
+    - 纯文本 (.txt)
+    - Markdown (.md, .markdown)
+    """
+    if not authorized:
+        raise HTTPException(status_code=400, detail="请先确认你拥有内容版权或已获明确授权")
+    
+    # 验证文件格式
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="文件名不能为空")
+    
+    suffix = Path(file.filename).suffix.lower()
+    allowed_formats = {".pdf", ".docx", ".doc", ".txt", ".md", ".markdown"}
+    if suffix not in allowed_formats:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"不支持的文件格式 {suffix}，支持的格式：{', '.join(allowed_formats)}"
+        )
+    
+    # 创建任务目录
+    job_id = uuid.uuid4().hex[:12]
+    work_dir = JOBS_ROOT / job_id
+    work_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 保存上传的文件
+    upload_dir = work_dir / "upload"
+    upload_dir.mkdir(exist_ok=True)
+    file_path = upload_dir / file.filename
+    
+    try:
+        content = await file.read()
+        file_path.write_bytes(content)
+    except Exception as exc:
+        shutil.rmtree(work_dir, ignore_errors=True)
+        raise HTTPException(status_code=500, detail=f"文件保存失败：{exc}")
+    
+    # 创建任务
+    job = Job(
+        id=job_id, 
+        url=None,  # 文档上传模式没有 URL
+        document_path=str(file_path),
+        image_strategy=image_strategy, 
+        work_dir=work_dir
+    )
+    jobs[job_id] = job
+    job.task = asyncio.create_task(_run_job(job))
+    return _snapshot(job)
 
 @app.get("/api/jobs/{job_id}")
 async def get_job(job_id: str) -> dict[str, Any]:

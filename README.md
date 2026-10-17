@@ -82,6 +82,47 @@ docker compose down
 python run.py "https://mp.weixin.qq.com/s/your-article-id"
 ```
 
+
+## 文档上传功能
+
+除了公众号链接，现在支持上传文档进行重写：
+
+**支持的格式：**
+- PDF 文档 (`.pdf`)
+- Word 文档 (`.docx`, `.doc`)
+- 纯文本 (`.txt`)
+- Markdown (`.md`, `.markdown`)
+
+**Web UI 使用：**
+
+1. 访问 `http://127.0.0.1:8000`
+2. 点击"上传文档"标签
+3. 拖拽或点击选择文件
+4. 选择图片处理策略
+5. 勾选版权确认
+6. 点击"开始重写"
+
+**命令行使用：**
+
+```bash
+# 处理文档
+python run.py path/to/document.pdf --file
+
+# 或交互式选择
+python run.py
+# 选择模式：2（文档）
+# 输入文档路径
+```
+
+**API 调用：**
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/jobs/upload \
+  -F "file=@document.pdf" \
+  -F "authorized=true" \
+  -F "image_strategy=skip"
+```
+
 ## 当前策略
 
 - `skip`：默认复制原图，不做内容重制。
