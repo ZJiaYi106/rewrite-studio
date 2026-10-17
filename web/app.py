@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -44,10 +44,10 @@ class CreateJobFromFileRequest(BaseModel):
 @dataclass
 class Job:
     id: str
-    url: str | None = None  # URL 或 None（如果是文档上传）
-    document_path: str | None = None  # 文档路径
     image_strategy: str
     work_dir: Path
+    url: str | None = None
+    document_path: str | None = None
     status: str = "queued"
     current_step: str = "queued"
     title: str | None = None
@@ -285,8 +285,8 @@ async def create_job(payload: CreateJobRequest) -> dict[str, Any]:
 @app.post("/api/jobs/upload", status_code=202)
 async def create_job_from_file(
     file: UploadFile = File(...),
-    authorized: bool = Field(..., description="用户确认拥有版权或已获明确授权"),
-    image_strategy: str = "skip"
+    authorized: bool = Form(..., description="用户确认拥有版权或已获明确授权"),
+    image_strategy: str = Form("skip")
 ) -> dict[str, Any]:
     """上传文档并创建处理任务
     
